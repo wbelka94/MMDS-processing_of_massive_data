@@ -17,6 +17,8 @@ class Samples:
     trackId = 1
     date = 2
 
+def getNextRow(f):
+    return parseRow(f.readLine())
 
 def loadSamples():
     f = open('data/triplets_sample_20p.txt')
@@ -48,8 +50,11 @@ def parseRow(row):
 
 def query1():
     result = {}
-    for sample in triplets_sample:
+    f = open('data/triplets_sample_20p.txt')
+    for line in f:
+        sample = parseRow(line)
         result[sample[Samples.trackId]] = result.get(sample[Samples.trackId], 0) + 1
+        sample = parseRow(f.readline())
     sorted_d = sorted(result.items(), key=operator.itemgetter(1), reverse=True)
     i = 0
     for k, v in sorted_d:
@@ -61,7 +66,9 @@ def query1():
 
 def query2():
     result = {}
-    for sample in triplets_sample:
+    f = open('data/triplets_sample_20p.txt')
+    for line in f:
+        sample = parseRow(line)
         tmp = result.get(sample[Samples.userId], {})
         tmp[sample[Samples.trackId]] = tmp.get(sample[Samples.trackId], 0) + 1
         result[sample[Samples.userId]] = tmp
@@ -78,7 +85,9 @@ def query2():
 
 def query3():
     result = {}
-    for sample in triplets_sample:
+    f = open('data/triplets_sample_20p.txt')
+    for line in f:
+        sample = parseRow(line)
         index = unique_tracks[sample[Samples.trackId]][UniqueTracks.author]
         result[index] = result.get(index, 0) + 1
     sorted_d = sorted(result.items(), key=operator.itemgetter(1))
@@ -87,7 +96,9 @@ def query3():
 
 def query4():
     result = {}
-    for sample in triplets_sample:
+    f = open('data/triplets_sample_20p.txt')
+    for line in f:
+        sample = parseRow(line)
         month = datetime.datetime.fromtimestamp(int(sample[Samples.date])).month
         result[month] = result.get(month, 0) + 1
     sorted_d = sorted(result.items(), key=operator.itemgetter(0))
@@ -101,7 +112,9 @@ def query5():
     for k, track in unique_tracks.items():
         if track[UniqueTracks.author] == "Queen":
             queenTracks[k] = []
-    for sample in triplets_sample:
+    f = open('data/triplets_sample_20p.txt')
+    for line in f:
+        sample = parseRow(line)
         track = sample[Samples.trackId]
         if track in queenTracks:
             if sample[Samples.userId] not in queenTracks[track]:
@@ -131,10 +144,10 @@ def query5():
 
 def main():
     globalStart = time.time()
-    start = time.time()
-    loadSamples()
-    end = time.time()
-    print("Time of loadSamples(): ", end - start)
+    # start = time.time()
+    # loadSamples()
+    # end = time.time()
+    # print("Time of loadSamples(): ", end - start)
     start = time.time()
     loadUniqueTracks()
     end = time.time()
