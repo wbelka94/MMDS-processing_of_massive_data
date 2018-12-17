@@ -1,6 +1,4 @@
 import time
-
-import pandas
 import operator
 import datetime
 
@@ -90,7 +88,7 @@ def query3():
 def query4():
     result = {}
     for sample in triplets_sample:
-        month = datetime.datetime.utcfromtimestamp(int(sample[Samples.date])).month
+        month = datetime.datetime.fromtimestamp(int(sample[Samples.date])).month
         result[month] = result.get(month, 0) + 1
     sorted_d = sorted(result.items(), key=operator.itemgetter(0))
     for month, value in sorted_d:
@@ -99,39 +97,39 @@ def query4():
 
 def query5():
     queenTracks = {}
+    queenTracksPopularity = {}
     for k, track in unique_tracks.items():
         if track[UniqueTracks.author] == "Queen":
             queenTracks[k] = []
     for sample in triplets_sample:
         track = sample[Samples.trackId]
         if track in queenTracks:
-            if track not in queenTracks[track]:
-                queenTracks[track].append(track)
+            if sample[Samples.userId] not in queenTracks[track]:
+                queenTracks[track].append(sample[Samples.userId])
+                queenTracksPopularity[track] = queenTracksPopularity.get(track, 0) + 1
+    sortedQueenTracksPopularity = sorted(queenTracksPopularity.items(), key=operator.itemgetter(1), reverse=True)
     result = {}
-    for trackId, users in queenTracks.items():
-        for user in users:
+    trackCounter = 0
+    for trackId, _ in sortedQueenTracksPopularity:
+        for user in queenTracks[trackId]:
             result[user] = result.get(user, 0) + 1
-    sorted_d = sorted(result.items(), key=operator.itemgetter(0), reverse=True)
+        trackCounter = trackCounter + 1
+        if trackCounter >= 3:
+            break
+    sorted_d = sorted(result.items(), key=operator.itemgetter(1), reverse=True)
+    sorted_d = sorted(sorted_d, key=operator.itemgetter(0))
     i = 0
     countOfUsers = 0
-    print(sorted_d)
     for k, v in sorted_d:
-        if v < 3:
-            break
-        if i < 10:
-            print(k)
-        i += 1
-        countOfUsers += 1
+        if v >= 3:
+            if i < 10:
+                print(k)
+            i += 1
+            countOfUsers = countOfUsers + 1
     print("Number of users: ", countOfUsers)
 
 
 def main():
-    # loadUniqueTracks()
-    # # print(unique_tracks['SOBONKR12A58A7A7E0'])
-    # for k, v in unique_tracks.items():
-    #     print(k)
-    #     print(v)
-    # exit()
     globalStart = time.time()
     start = time.time()
     loadSamples()
@@ -141,22 +139,22 @@ def main():
     loadUniqueTracks()
     end = time.time()
     print("Time of loadUniqueTracks(): ", end - start)
-    # start = time.time()
-    # query1()
-    # end = time.time()
-    # print("Time of query1(): ", end - start)
-    # start = time.time()
-    # query2()
-    # end = time.time()
-    # print("Time of query2(): ", end - start)
-    # start = time.time()
-    # query3()
-    # end = time.time()
-    # print("Time of query3(): ", end - start)
-    # start = time.time()
-    # query4()
-    # end = time.time()
-    # print("Time of query4(): ", end - start)
+    start = time.time()
+    query1()
+    end = time.time()
+    print("Time of query1(): ", end - start)
+    start = time.time()
+    query2()
+    end = time.time()
+    print("Time of query2(): ", end - start)
+    start = time.time()
+    query3()
+    end = time.time()
+    print("Time of query3(): ", end - start)
+    start = time.time()
+    query4()
+    end = time.time()
+    print("Time of query4(): ", end - start)
     start = time.time()
     query5()
     end = time.time()
